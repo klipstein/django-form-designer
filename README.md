@@ -50,7 +50,7 @@ This document assumes that you are familiar with Python and Django.
 7. Add the form_designer admin URLs to your URL conf if you want to use CSV export. Add the following line to `urls.py` _before_ the admin URLs:
 
         urlpatterns = patterns('',
-            (r'^admin/form_designer/', include('form_designer.admin_urls')),
+            (r'^admin/form_designer/', include('form_designer.admin.urls')),
             ...
             (r'^admin/', include(admin.site.urls)),
         )

@@ -1,17 +1,18 @@
+import os
 from django.contrib import admin
-from form_designer.models import FormDefinition, FormDefinitionField, FormLog
 from django import forms
 from django.utils.translation import ugettext as _
 from django.db import models
 from django.conf import settings
-import os
+
+from form_designer.models import FormDefinition, FormDefinitionField, FormLog
 
 MEDIA_SUBDIR = 'form_designer'
 
 class FormDefinitionFieldInlineForm(forms.ModelForm):
     class Meta:
         model = FormDefinitionField
-        
+
     def clean_choice_model(self):
         if not self.cleaned_data['choice_model'] and self.cleaned_data.has_key('field_class') and self.cleaned_data['field_class'] in ('forms.ModelChoiceField', 'forms.ModelMultipleChoiceField'):
             raise forms.ValidationError(_('This field class requires a model.'))
