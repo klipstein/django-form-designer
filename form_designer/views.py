@@ -8,6 +8,7 @@ from django.forms import widgets
 from django.http import HttpResponseRedirect
 from django.conf import settings
 from form_designer import app_settings
+from django.contrib import messages
 
 class DesignedForm(forms.Form):
     def __init__(self, form_definition, initial_data=None, *args, **kwargs):
@@ -41,10 +42,8 @@ def process_form(request, form_definition, context={}, is_cms_plugin=False):
     if is_submit:
         if form.is_valid():
             # Successful submission
-            if 'django_notify' in settings.INSTALLED_APPS:
-                request.notifications.success(success_message)
-            else:
-                message = success_message
+            messages.success(request, success_message)
+            message = success_message
             if form_definition.log_data:
                 form_definition.log(form)
             if form_definition.mail_to:
@@ -55,10 +54,8 @@ def process_form(request, form_definition, context={}, is_cms_plugin=False):
             if form_definition.success_clear:
                 form = DesignedForm(form_definition) # clear form
         else:
-            if 'django_notify' in settings.INSTALLED_APPS:
-                request.notifications.error(error_message)
-            else:
-                message = error_message
+            messages.error(request, error_message)
+            message = error_message
     else:
         if form_definition.allow_get_initial:
             form = DesignedForm(form_definition, initial_data=request.GET)
