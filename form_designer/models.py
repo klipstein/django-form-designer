@@ -6,6 +6,8 @@ from django.conf import settings
 from form_designer import app_settings
 import re
 from pickled_object_field import PickledObjectField
+from picklefield.fields import PickledObjectField
+
 from form_designer.fields import TemplateTextField, TemplateCharField, ModelNameField
 
 class FormDefinition(models.Model):
