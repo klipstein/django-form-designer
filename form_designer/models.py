@@ -6,8 +6,7 @@ from django.conf import settings
 from form_designer import app_settings
 import re
 from pickled_object_field import PickledObjectField
-from model_name_field import ModelNameField
-from template_field import TemplateTextField, TemplateCharField
+from form_designer.fields import TemplateTextField, TemplateCharField, ModelNameField
 
 class FormDefinition(models.Model):
     name = models.SlugField(_('Name'), max_length=255, unique=True)
