@@ -66,3 +66,7 @@ Missing features
 ----------------
   
 * File upload fields should be implemented
+
+
+django-picklefield
+
