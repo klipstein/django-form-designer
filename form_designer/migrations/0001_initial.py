@@ -14,9 +14,9 @@ class Migration(SchemaMigration):
             ('name', self.gf('django.db.models.fields.SlugField')(unique=True, max_length=255, db_index=True)),
             ('title', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
             ('action', self.gf('django.db.models.fields.URLField')(max_length=255, null=True, blank=True)),
-            ('mail_to', self.gf('form_designer.template_field.TemplateCharField')(max_length=255, null=True, blank=True)),
-            ('mail_from', self.gf('form_designer.template_field.TemplateCharField')(max_length=255, null=True, blank=True)),
-            ('mail_subject', self.gf('form_designer.template_field.TemplateCharField')(max_length=255, null=True, blank=True)),
+            ('mail_to', self.gf('form_designer.fields.TemplateCharField')(max_length=255, null=True, blank=True)),
+            ('mail_from', self.gf('form_designer.fields.TemplateCharField')(max_length=255, null=True, blank=True)),
+            ('mail_subject', self.gf('form_designer.fields.TemplateCharField')(max_length=255, null=True, blank=True)),
             ('method', self.gf('django.db.models.fields.CharField')(default='POST', max_length=10)),
             ('success_message', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
             ('error_message', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
@@ -25,7 +25,7 @@ class Migration(SchemaMigration):
             ('success_redirect', self.gf('django.db.models.fields.BooleanField')(default=False, blank=True)),
             ('success_clear', self.gf('django.db.models.fields.BooleanField')(default=True, blank=True)),
             ('allow_get_initial', self.gf('django.db.models.fields.BooleanField')(default=True, blank=True)),
-            ('message_template', self.gf('form_designer.template_field.TemplateTextField')(null=True, blank=True)),
+            ('message_template', self.gf('form_designer.fields.TemplateTextField')(null=True, blank=True)),
             ('form_template_name', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
         ))
         db.send_create_signal('form_designer', ['FormDefinition'])
@@ -35,7 +35,7 @@ class Migration(SchemaMigration):
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('created', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, blank=True)),
             ('form_definition', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['form_designer.FormDefinition'])),
-            ('data', self.gf('form_designer.pickled_object_field.PickledObjectField')(null=True, blank=True)),
+            ('data', self.gf('picklefield.fields.PickledObjectField')(null=True, blank=True)),
         ))
         db.send_create_signal('form_designer', ['FormLog'])
 
@@ -61,7 +61,7 @@ class Migration(SchemaMigration):
             ('max_digits', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
             ('decimal_places', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
             ('regex', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
-            ('choice_model', self.gf('form_designer.model_name_field.ModelNameField')(max_length=255, null=True, blank=True)),
+            ('choice_model', self.gf('form_designer.fields.ModelNameField')(max_length=255, null=True, blank=True)),
             ('choice_model_empty_label', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
         ))
         db.send_create_signal('form_designer', ['FormDefinitionField'])
@@ -126,10 +126,10 @@ class Migration(SchemaMigration):
             'form_template_name': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'log_data': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),
-            'mail_from': ('form_designer.template_field.TemplateCharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
-            'mail_subject': ('form_designer.template_field.TemplateCharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
-            'mail_to': ('form_designer.template_field.TemplateCharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
-            'message_template': ('form_designer.template_field.TemplateTextField', [], {'null': 'True', 'blank': 'True'}),
+            'mail_from': ('form_designer.fields.TemplateCharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
+            'mail_subject': ('form_designer.fields.TemplateCharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
+            'mail_to': ('form_designer.fields.TemplateCharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
+            'message_template': ('form_designer.fields.TemplateTextField', [], {'null': 'True', 'blank': 'True'}),
             'method': ('django.db.models.fields.CharField', [], {'default': "'POST'", 'max_length': '10'}),
             'name': ('django.db.models.fields.SlugField', [], {'unique': 'True', 'max_length': '255', 'db_index': 'True'}),
             'submit_label': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
@@ -141,7 +141,7 @@ class Migration(SchemaMigration):
         'form_designer.formdefinitionfield': {
             'Meta': {'object_name': 'FormDefinitionField'},
             'choice_labels': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
-            'choice_model': ('form_designer.model_name_field.ModelNameField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
+            'choice_model': ('form_designer.fields.ModelNameField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
             'choice_model_empty_label': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
             'choice_values': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
             'decimal_places': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
@@ -166,7 +166,7 @@ class Migration(SchemaMigration):
         'form_designer.formlog': {
             'Meta': {'object_name': 'FormLog'},
             'created': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
-            'data': ('form_designer.pickled_object_field.PickledObjectField', [], {'null': 'True', 'blank': 'True'}),
+            'data': ('picklefield.fields.PickledObjectField', [], {'null': 'True', 'blank': 'True'}),
             'form_definition': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['form_designer.FormDefinition']"}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'})
         }
