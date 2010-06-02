@@ -7,6 +7,7 @@ from django.utils.translation import ugettext as _
 from django.http import HttpResponseRedirect
 from django.conf import settings
 from django.contrib import messages
+from django.core.context_processors import csrf
 
 from form_designer.models import FormDefinition
 
@@ -30,7 +31,8 @@ def process_form(request, form_definition, context={}, is_cms_plugin=False):
     success_message = form_definition.success_message or _('Thank you, the data was submitted successfully.')
     error_message = form_definition.error_message or _('The data could not be submitted, please try again.')
     message = None
-
+    form_error = False
+    form_success = False
     is_submit = False
     # If the form has been submitted...
     if request.method == 'POST' and request.POST.get(form_definition.submit_flag_name):
@@ -45,6 +47,7 @@ def process_form(request, form_definition, context={}, is_cms_plugin=False):
             # Successful submission
             messages.success(request, success_message)
             message = success_message
+            form_success = True
             if form_definition.log_data:
                 form_definition.log(form)
             if form_definition.mail_to:
@@ -55,6 +58,7 @@ def process_form(request, form_definition, context={}, is_cms_plugin=False):
             if form_definition.success_clear:
                 form = DesignedForm(form_definition) # clear form
         else:
+            form_error = True
             messages.error(request, error_message)
             message = error_message
     else:
@@ -65,10 +69,12 @@ def process_form(request, form_definition, context={}, is_cms_plugin=False):
 
     context.update({
         'message': message,
+        'form_error': form_error,
+        'form_success': form_success,
         'form': form,
         'form_definition': form_definition
     })
-
+    context.update(csrf(request))
     return context
 
 def detail(request, object_name):

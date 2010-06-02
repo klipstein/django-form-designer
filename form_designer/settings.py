@@ -23,12 +23,15 @@ WIDGET_CLASSES = getattr(settings, 'FORM_DESIGNER_WIDGET_CLASSES', (
     ('widgets.Textarea', _('Text area')),
     ('widgets.PasswordInput', _('Password input')),
     ('widgets.HiddenInput', _('Hidden input')),
+    ('widgets.RadioSelect', _('Radio button')),
 ))
 
 FORM_TEMPLATES = getattr(settings, 'FORM_DESIGNER_FORM_TEMPLATES', (
     ('', _('Default')),
     ('html/formdefinition/forms/as_p.html', _('as paragraphs')),
     ('html/formdefinition/forms/as_table.html', _('as table')),
+    ('html/formdefinition/forms/as_ul.html', _('as unordered list')),
+    ('html/formdefinition/forms/custom.html', _('custom implementation')),
 ))
 
 # Sequence of two-tuples like (('your_app.models.ModelName', 'My Model'), ...) for limiting the models available to ModelChoiceField and ModelMultipleChoiceField.
