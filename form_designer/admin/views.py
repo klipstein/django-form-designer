@@ -1,4 +1,4 @@
-# encoding=utf8
+# encoding: utf-8
 import csv
 from django.http import HttpResponse
 from django.utils.translation import ugettext as _
