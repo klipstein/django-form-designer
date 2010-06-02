@@ -20,12 +20,10 @@ Installation
 
 This document assumes that you are familiar with Python and Django.
 
-1. [Download and unzip the current release](http://github.com/philomat/django-form-designer/downloads/), or install using `git` as shown below (the latter two commands are necessary to pull submodule dependencies):
+1. [Download and unzip the current release](http://github.com/philomat/django-form-designer/downloads/), or install using `git` as shown below):
 
         $ git clone git://github.com/philomat/django-form-designer.git
         $ cd django-form-designer
-        $ git submodule init
-        $ git submodule update
 
 2. Make sure `form_designer` is on your `PYTHONPATH`.
 3. Make the directory `form_designer/media/form_designer` available under your `MEDIA_ROOT`.
@@ -60,13 +58,14 @@ Optional requirements
 
 * The form_designer admin interface requires jQuery and the jQuery UI Sortable plugin to make building forms a lot more user-friendly. The two Javascript files are bundled with form_designer. Optionally, if Django CMS is installed, the files bundled with that app will be used. If you want to use you own jquery.js instead because you're already including it anyway, define JQUERY_JS in your settings file. For instance:
 
-        JQUERY_JS = 'jquery/jquery-latest.js'
+        JQUERY_URL = 'jquery/jquery-latest.js'
 
 Missing features
 ----------------
   
 * File upload fields should be implemented
 
+Dependencies
+------------
 
 django-picklefield
-
