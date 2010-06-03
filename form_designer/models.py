@@ -263,3 +263,7 @@ if 'cms' in django_settings.INSTALLED_APPS:
 
         def __unicode__(self):
             return self.form_definition.__unicode__()
+
+if 'south' in django_settings.INSTALLED_APPS:
+    from south.modelsinspector import add_introspection_rules
+    add_introspection_rules([], ["^form_designer\.fields\..*"])
