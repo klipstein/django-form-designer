@@ -8,8 +8,27 @@ from django.http import HttpResponseRedirect
 from django.conf import settings
 from django.contrib import messages
 from django.core.context_processors import csrf
+from django.core.exceptions import ImproperlyConfigured
+from django.utils.importlib import import_module
 
 from form_designer.models import FormDefinition
+
+def get_class(import_path):
+    try:
+        dot = import_path.rindex('.')
+    except ValueError:
+        raise ImproperlyConfigured("%s isn't a Python path." % import_path)
+    module, classname = import_path[:dot], import_path[dot + 1:]
+    try:
+        mod = import_module(module)
+    except ImportError, e:
+        raise ImproperlyConfigured('Error importing module %s: "%s"' %
+                                   (module, e))
+    try:
+        return getattr(mod, classname)
+    except AttributeError:
+        raise ImproperlyConfigured('Module "%s" does not define a "%s" '
+                                   'class.' % (module, classname))
 
 
 class DesignedForm(forms.Form):
@@ -25,7 +44,7 @@ class DesignedForm(forms.Form):
                 def_field.initial = initial_data.get(def_field.name)
             else:
                 def_field.initial = initial_data.getlist(def_field.name)
-        self.fields[def_field.name] = eval(def_field.field_class)(**def_field.get_form_field_init_args())
+        self.fields[def_field.name] = get_class(def_field.field_class)(**def_field.get_form_field_init_args())
 
 def process_form(request, form_definition, context={}, is_cms_plugin=False):
     success_message = form_definition.success_message or _('Thank you, the data was submitted successfully.')

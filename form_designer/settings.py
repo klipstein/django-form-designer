@@ -2,28 +2,29 @@ from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 
 FIELD_CLASSES = getattr(settings, 'FORM_DESIGNER_FIELD_CLASSES', (
-    ('forms.CharField', _('Text')),
-    ('forms.EmailField', _('E-mail address')),
-    ('forms.URLField', _('Web address')),
-    ('forms.IntegerField', _('Number')),
-    ('forms.DecimalField', _('Decimal number')),
-    ('forms.BooleanField', _('Yes/No')),
-    ('forms.DateField', _('Date')),
-    ('forms.DateTimeField', _('Date & time')),
-    ('forms.TimeField', _('Time')),
-    ('forms.ChoiceField', _('Choice')),
-    ('forms.MultipleChoiceField', _('Multiple Choice')),
-    ('forms.ModelChoiceField', _('Model Choice')),
-    ('forms.ModelMultipleChoiceField', _('Model Multiple Choice')),
-    ('forms.RegexField', _('Regex')),
+    ('django.forms.CharField', _('Text')),
+    ('django.forms.EmailField', _('E-mail address')),
+    ('django.forms.URLField', _('Web address')),
+    ('django.forms.IntegerField', _('Number')),
+    ('django.forms.DecimalField', _('Decimal number')),
+    ('django.forms.BooleanField', _('Yes/No')),
+    ('django.forms.DateField', _('Date')),
+    ('django.forms.DateTimeField', _('Date & time')),
+    ('django.forms.TimeField', _('Time')),
+    ('django.forms.ChoiceField', _('Choice')),
+    ('django.forms.MultipleChoiceField', _('Multiple Choice')),
+    ('django.forms.ModelChoiceField', _('Model Choice')),
+    ('django.forms.ModelMultipleChoiceField', _('Model Multiple Choice')),
+    ('django.forms.RegexField', _('Regex')),
+    # ('captcha.fields.CaptchaField', _('Captcha')),
 ))
 
 WIDGET_CLASSES = getattr(settings, 'FORM_DESIGNER_WIDGET_CLASSES', (
     ('', _('Default')),
-    ('widgets.Textarea', _('Text area')),
-    ('widgets.PasswordInput', _('Password input')),
-    ('widgets.HiddenInput', _('Hidden input')),
-    ('widgets.RadioSelect', _('Radio button')),
+    ('django.forms.widgets.Textarea', _('Text area')),
+    ('django.forms.widgets.PasswordInput', _('Password input')),
+    ('django.forms.widgets.HiddenInput', _('Hidden input')),
+    ('django.forms.widgets.RadioSelect', _('Radio button')),
 ))
 
 FORM_TEMPLATES = getattr(settings, 'FORM_DESIGNER_FORM_TEMPLATES', (

@@ -242,7 +242,7 @@ class FormDefinitionField(models.Model):
 
         if self.widget:
             args.update({
-                'widget': eval(self.widget)()
+                'widget': get_class(self.widget)()
             })
         
         return args
