@@ -98,7 +98,10 @@ class FormDefinition(models.Model):
         return self.title or self.name
 
     def log(self, form):
-        FormLog(form_definition=self, data=self.get_form_data(form)).save()
+        form_data = self.get_form_data(form)
+        #if self.mail_to:
+        #    form_data.append({'name': 'mail', 'label': 'mail', 'value': self.compile_message(form_data)})
+        FormLog(form_definition=self, data=form_data).save()
 
     def string_template_replace(self, text, context_dict):
         from django.template import Context, Template, TemplateSyntaxError
