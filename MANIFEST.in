@@ -3,4 +3,4 @@ include README.md
 include LICENSE
 recursive-include form_designer/templates *.html *.txt
 recursive-include form_designer/media *.js
-recursive-include form_designer/locale/* *.po *.mo
+recursive-include form_designer/locale *.po *.mo
