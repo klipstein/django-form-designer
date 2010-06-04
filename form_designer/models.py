@@ -5,11 +5,30 @@ from django.utils.translation import ugettext, ugettext_lazy as _
 from django.forms import widgets
 from django.core.mail import send_mail
 from django.conf import settings as django_settings
+from django.core.exceptions import ImproperlyConfigured
+from django.utils.importlib import import_module
 
 from picklefield.fields import PickledObjectField
 
 from form_designer.fields import TemplateTextField, TemplateCharField, ModelNameField
 from form_designer import settings
+
+def get_class(import_path):
+    try:
+        dot = import_path.rindex('.')
+    except ValueError:
+        raise ImproperlyConfigured("%s isn't a Python path." % import_path)
+    module, classname = import_path[:dot], import_path[dot + 1:]
+    try:
+        mod = import_module(module)
+    except ImportError, e:
+        raise ImproperlyConfigured('Error importing module %s: "%s"' %
+                                   (module, e))
+    try:
+        return getattr(mod, classname)
+    except AttributeError:
+        raise ImproperlyConfigured('Module "%s" does not define a "%s" '
+                                   'class.' % (module, classname))
 
 class FormDefinition(models.Model):
     name = models.SlugField(_('Name'), max_length=255, unique=True)
