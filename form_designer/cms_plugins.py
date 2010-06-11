@@ -9,7 +9,7 @@ from form_designer import settings
 
 class FormDesignerPlugin(CMSPluginBase):
     model = CMSFormDefinition
-    name = _("Form")
+    name = _('Form')
     admin_preview = False
 
     def render(self, context, instance, placeholder):

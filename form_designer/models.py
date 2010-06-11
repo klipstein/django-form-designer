@@ -35,7 +35,7 @@ class FormDefinition(models.Model):
     action = models.URLField(_('Target URL'), max_length=255, blank=True, null=True, help_text=_('If you leave this empty, the page where the form resides will be requested, and you can use the mail form and logging features. You can also send data to external sites: For instance, enter "http://www.google.ch/search" to create a search form.'))
     mail_to = TemplateCharField(_('Send form data to e-mail address'), max_length=255, blank=True, null=True, help_text=('Separate several addresses with a comma. Your form fields are available as template context. Example: "admin@domain.com, {{ from_email }}" if you have a field named `from_email`.'))
     mail_from = TemplateCharField(_('Sender address'), max_length=255, blank=True, null=True, help_text=('Your form fields are available as template context. Example: "{{ firstname }} {{ lastname }} <{{ from_email }}>" if you have fields named `first_name`, `last_name`, `from_email`.'))
-    mail_subject = TemplateCharField(_('e-Mail subject'), max_length=255, blank=True, null=True), help_text=('Your form fields are available as template context. Example: "Contact form {{ subject }}" if you have a field named `subject`.')
+    mail_subject = TemplateCharField(_('e-Mail subject'), max_length=255, blank=True, null=True, help_text=('Your form fields are available as template context. Example: "Contact form {{ subject }}" if you have a field named `subject`.'))
     method = models.CharField(_('Method'), max_length=10, default="POST", choices = (('POST', 'POST'), ('GET', 'GET')))
     success_message = models.CharField(_('Success message'), max_length=255, blank=True, null=True)
     error_message = models.CharField(_('Error message'), max_length=255, blank=True, null=True)
