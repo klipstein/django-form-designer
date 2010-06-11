@@ -1,12 +1,12 @@
-# encoding=utf-8
+# encoding=utf8
+import csv
 from django.http import HttpResponse
+from django.utils.translation import ugettext as _
+
 from form_designer.models import FormLog
 from form_designer.admin import FormLogAdmin
-from form_designer import app_settings
-from django.utils.translation import ugettext as _
 from form_designer.templatetags.friendly import friendly
-from django.conf import settings
-import csv
+from form_designer import settings
 
 # Returns a QuerySet with the same ordering and filtering like the one that would be visible in Django admin
 def get_change_list_query_set(model_admin, model, request):
@@ -19,17 +19,17 @@ def get_change_list_query_set(model_admin, model, request):
 
 def export_csv(request):
     response = HttpResponse(mimetype='text/csv')
-    response['Content-Disposition'] = 'attachment; filename='+app_settings.get('FORM_DESIGNER_CSV_EXPORT_FILENAME')
-    writer = csv.writer(response, delimiter=app_settings.get('FORM_DESIGNER_CSV_EXPORT_DELIMITER'))
+    response['Content-Disposition'] = 'attachment; filename=' + settings.CSV_EXPORT_FILENAME
+    writer = csv.writer(response, delimiter=settings.CSV_EXPORT_DELIMITER)
     qs = get_change_list_query_set(FormLogAdmin, FormLog, request)
     
     from django.db.models import Count
     distinct_forms = qs.aggregate(Count('form_definition', distinct=True))['form_definition__count']
     
-    include_created = app_settings.get('FORM_DESIGNER_CSV_EXPORT_INCLUDE_CREATED')
-    include_pk = app_settings.get('FORM_DESIGNER_CSV_EXPORT_INCLUDE_PK')
-    include_header = app_settings.get('FORM_DESIGNER_CSV_EXPORT_INCLUDE_HEADER') and distinct_forms == 1
-    include_form = app_settings.get('FORM_DESIGNER_CSV_EXPORT_INCLUDE_FORM') and distinct_forms > 1
+    include_created = settings.CSV_EXPORT_INCLUDE_CREATED
+    include_pk = settings.CSV_EXPORT_INCLUDE_PK
+    include_header = settings.CSV_EXPORT_INCLUDE_HEADER and distinct_forms == 1
+    include_form = settings.CSV_EXPORT_INCLUDE_FORM and distinct_forms > 1
 
     if include_header:
         header = [] 
@@ -55,7 +55,7 @@ def export_csv(request):
             value = friendly(field['value'])
             if not isinstance(value, basestring):
                 value = unicode(value)
-            value = value.encode(settings.DEFAULT_CHARSET)
+            value = value.encode(settings.CSV_EXPORT_ENCODING)
             row.append(value)
         writer.writerow(row)
 

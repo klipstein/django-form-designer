@@ -1,14 +1,15 @@
+from django import forms
+from django.forms import widgets
 from django.shortcuts import get_object_or_404, render_to_response
 from django.template import RequestContext
 from django.db import models
-from form_designer.models import FormDefinition
 from django.utils.translation import ugettext as _
-from django import forms
-from django.forms import widgets
 from django.http import HttpResponseRedirect
 from django.conf import settings
-from form_designer import app_settings
 from django.contrib import messages
+
+from form_designer.models import FormDefinition
+
 
 class DesignedForm(forms.Form):
     def __init__(self, form_definition, initial_data=None, *args, **kwargs):
@@ -77,6 +78,6 @@ def detail(request, object_name):
         return result
     else:
         result.update({
-            'form_template': form_definition.form_template_name or app_settings.get('FORM_DESIGNER_DEFAULT_FORM_TEMPLATE')
+            'form_template': form_definition.form_template_name or settings.DEFAULT_FORM_TEMPLATE
         })
         return render_to_response('html/formdefinition/detail.html', result, context_instance=RequestContext(request))
