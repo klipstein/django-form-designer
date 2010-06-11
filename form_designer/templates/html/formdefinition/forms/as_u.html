@@ -2,11 +2,10 @@
 <h2>{{ form_definition.title }}</h2>
 {% if message %}
 <ul class="notifications">
-  <li>{{ message }}</li>
+	<li>{{ message }}</li>
 </ul>
 {% endif %}
-<form name="{{ form_definition.name }}" action="{{ form_definition.action }}" method="{{ form_definition.method }}">
-{% csrf_token %}
-{{ form.as_ul }}
-<input type="submit" value="{% if form_definition.submit_label %}{{ form_definition.submit_label }}{% else %}{% trans "Submit" %}{% endif %}" />
+<form name="{{ form_definition.name }}" action="{{ form_definition.action }}" method="{{ form_definition.method }}">{% csrf_token %}
+	{{ form.as_ul }}
+	<input type="submit" value="{% if form_definition.submit_label %}{{ form_definition.submit_label }}{% else %}{% trans 'Submit' %}{% endif %}" />
 </form>

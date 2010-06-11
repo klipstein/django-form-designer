@@ -1,13 +1,12 @@
 from django import forms
-from django.forms import widgets
-from django.shortcuts import get_object_or_404, render_to_response
-from django.template import RequestContext
-from django.db import models
-from django.utils.translation import ugettext as _
-from django.http import HttpResponseRedirect
 from django.conf import settings
 from django.contrib import messages
 from django.core.context_processors import csrf
+from django.forms import widgets
+from django.http import HttpResponseRedirect
+from django.shortcuts import get_object_or_404, render_to_response
+from django.template import RequestContext
+from django.utils.translation import ugettext as _
 
 from form_designer.models import FormDefinition, get_class
 
@@ -40,7 +39,7 @@ def process_form(request, form_definition, context={}, is_cms_plugin=False):
     if request.method == 'GET' and request.GET.get(form_definition.submit_flag_name):
         form = DesignedForm(form_definition, None, request.GET)
         is_submit = True
-    
+
     if is_submit:
         if form.is_valid():
             # Successful submission

@@ -1,17 +1,16 @@
 import re
 
-from django.db import models
-from django.utils.translation import ugettext, ugettext_lazy as _
-from django.forms import widgets
-from django.core.mail import send_mail
 from django.conf import settings as django_settings
 from django.core.exceptions import ImproperlyConfigured
+from django.core.mail import send_mail
+from django.db import models
 from django.utils.importlib import import_module
+from django.utils.translation import ugettext_lazy as _
 
 from picklefield.fields import PickledObjectField
 
-from form_designer.fields import TemplateTextField, TemplateCharField, ModelNameField
 from form_designer import settings
+from form_designer.fields import TemplateTextField, TemplateCharField, ModelNameField
 
 def get_class(import_path):
     try:
@@ -33,19 +32,19 @@ def get_class(import_path):
 class FormDefinition(models.Model):
     name = models.SlugField(_('Name'), max_length=255, unique=True)
     title = models.CharField(_('Title'), max_length=255, blank=True, null=True)
-    action = models.URLField(_('Target URL'), help_text=_('If you leave this empty, the page where the form resides will be requested, and you can use the mail form and logging features. You can also send data to external sites: For instance, enter "http://www.google.ch/search" to create a search form.'), max_length=255, blank=True, null=True)
-    mail_to = TemplateCharField(_('Send form data to e-mail address'), help_text=('Separate several addresses with a comma. Your form fields are available as template context. Example: "admin@domain.com, {{ from_email }}" if you have a field named `from_email`.'), max_length=255, blank=True, null=True)
-    mail_from = TemplateCharField(_('Sender address'), max_length=255, help_text=('Your form fields are available as template context. Example: "{{ firstname }} {{ lastname }} <{{ from_email }}>" if you have fields named `first_name`, `last_name`, `from_email`.'), blank=True, null=True)
-    mail_subject = TemplateCharField(_('e-Mail subject'), max_length=255, help_text=('Your form fields are available as template context. Example: "Contact form {{ subject }}" if you have a field named `subject`.'), blank=True, null=True)
+    action = models.URLField(_('Target URL'), max_length=255, blank=True, null=True, help_text=_('If you leave this empty, the page where the form resides will be requested, and you can use the mail form and logging features. You can also send data to external sites: For instance, enter "http://www.google.ch/search" to create a search form.'))
+    mail_to = TemplateCharField(_('Send form data to e-mail address'), max_length=255, blank=True, null=True, help_text=('Separate several addresses with a comma. Your form fields are available as template context. Example: "admin@domain.com, {{ from_email }}" if you have a field named `from_email`.'))
+    mail_from = TemplateCharField(_('Sender address'), max_length=255, blank=True, null=True, help_text=('Your form fields are available as template context. Example: "{{ firstname }} {{ lastname }} <{{ from_email }}>" if you have fields named `first_name`, `last_name`, `from_email`.'))
+    mail_subject = TemplateCharField(_('e-Mail subject'), max_length=255, blank=True, null=True), help_text=('Your form fields are available as template context. Example: "Contact form {{ subject }}" if you have a field named `subject`.')
     method = models.CharField(_('Method'), max_length=10, default="POST", choices = (('POST', 'POST'), ('GET', 'GET')))
     success_message = models.CharField(_('Success message'), max_length=255, blank=True, null=True)
     error_message = models.CharField(_('Error message'), max_length=255, blank=True, null=True)
     submit_label = models.CharField(_('Submit button label'), max_length=255, blank=True, null=True)
-    log_data = models.BooleanField(_('Log form data'), help_text=_('Logs all form submissions to the database.'), default=True)
-    success_redirect = models.BooleanField(_('Redirect after success'), help_text=_('You should install django_notify if you want to enable this.') if not 'django_notify' in settings.INSTALLED_APPS else None, default=False)
+    log_data = models.BooleanField(_('Log form data'), default=True, help_text=_('Logs all form submissions to the database.'))
+    success_redirect = models.BooleanField(_('Redirect after success'), default=False)
     success_clear = models.BooleanField(_('Clear form after success'), default=True)
-    allow_get_initial = models.BooleanField(_('Allow initial values via URL'), help_text=_('If enabled, you can fill in form fields by adding them to the query string.'), default=True)
-    message_template = TemplateTextField(_('Message template'), help_text=_('Your form fields are available as template context. Example: "{{ message }}" if you have a field named `message`. To iterate over all fields, use the variable `data` (a list containing a dictionary for each form field, each containing the elements `name`, `label`, `value`).'), blank=True, null=True)
+    allow_get_initial = models.BooleanField(_('Allow initial values via URL'), default=True, help_text=_('If enabled, you can fill in form fields by adding them to the query string.'))
+    message_template = TemplateTextField(_('Message template'), blank=True, null=True, help_text=_('Your form fields are available as template context. Example: "{{ message }}" if you have a field named `message`. To iterate over all fields, use the variable `data` (a list containing a dictionary for each form field, each containing the elements `name`, `label`, `value`).'))
     form_template_name = models.CharField(_('Form template'), max_length=255, choices=settings.FORM_TEMPLATES, blank=True, null=True)
 
     class Meta:
@@ -57,7 +56,7 @@ class FormDefinition(models.Model):
         for field in self.formdefinitionfield_set.all():
             dict[field.name] = field
         return dict
-        
+
     def get_form_data(self, form):
         data = []
         field_dict = self.get_field_dict()
@@ -70,7 +69,7 @@ class FormDefinition(models.Model):
                     value = value.__form_data__()
                 data.append({'name': key, 'label': form.fields[key].label, 'value': value})
         return data
-        
+
     def get_form_data_dict(self, form_data):
         dict = {}
         for field in form_data:
@@ -78,8 +77,8 @@ class FormDefinition(models.Model):
         return dict
 
     def compile_message(self, form_data, template=None):
-        from django.template.loader import get_template
         from django.template import Context, Template
+        from django.template.loader import get_template
         if template:
             t = get_template(template)
         elif not self.message_template:
@@ -116,24 +115,22 @@ class FormDefinition(models.Model):
         message = self.compile_message(form_data)
         context_dict = self.get_form_data_dict(form_data)
 
-        import re 
         mail_to = re.compile('\s*[,;]+\s*').split(self.mail_to)
         for key, email in enumerate(mail_to):
             mail_to[key] = self.string_template_replace(email, context_dict)
-        
+
         mail_from = self.mail_from or None
         if mail_from:
             mail_from = self.string_template_replace(mail_from, context_dict)
-        
+
         if self.mail_subject:
             mail_subject = self.string_template_replace(self.mail_subject, context_dict)
         else:
             mail_subject = self.title
-        
+
         import logging
         logging.debug('Mail: '+repr(mail_from)+' --> '+repr(mail_to));
-        
-        from django.core.mail import send_mail
+
         send_mail(mail_subject, message, mail_from or None, mail_to, fail_silently=False)
 
     @property
@@ -162,13 +159,13 @@ class FormDefinitionField(models.Model):
     name = models.SlugField(_('Name'), max_length=255)
     label = models.CharField(_('Label'), max_length=255, blank=True, null=True)
     required = models.BooleanField(_('Required'), default=True)
-    include_result = models.BooleanField(_('Include in result'), help_text=('If this is disabled, the field value will not be included in logs and e-mails generated from form data.'), default=True)
+    include_result = models.BooleanField(_('Include in result'), default=True, help_text=('If this is disabled, the field value will not be included in logs and e-mails generated from form data.'))
     widget = models.CharField(_('Widget'), default='', choices=settings.WIDGET_CLASSES, max_length=255, blank=True, null=True)
     initial = models.TextField(_('Initial value'), blank=True, null=True)
     help_text = models.CharField(_('Help text'), max_length=255, blank=True, null=True)
 
-    choice_values = models.TextField(_('Values'), help_text=_('One value per line'), blank=True, null=True)
-    choice_labels = models.TextField(_('Labels'), help_text=_('One label per line'), blank=True, null=True)
+    choice_values = models.TextField(_('Values'), blank=True, null=True, help_text=_('One value per line'))
+    choice_labels = models.TextField(_('Labels'), blank=True, null=True, help_text=_('One label per line'))
 
     max_length = models.IntegerField(_('Max. length'), blank=True, null=True)
     min_length = models.IntegerField(_('Min. length'), blank=True, null=True)
@@ -186,21 +183,25 @@ class FormDefinitionField(models.Model):
     class Meta:
         verbose_name = _('Field')
         verbose_name_plural = _('Fields')
+        ordering = ['position']
+
+    def __unicode__(self):
+        return self.label if self.label else self.name
+
+    # def ____init__(self, field_class=None, name=None, required=None, widget=None, label=None, initial=None, help_text=None, *args, **kwargs):
+    #     super(FormDefinitionField, self).__init__(*args, **kwargs)
+    #     self.name = name
+    #     self.field_class = field_class
+    #     self.required = required
+    #     self.widget = widget
+    #     self.label = label
+    #     self.initial = initial
+    #     self.help_text = help_text
 
     def save(self):
         if self.position == None:
             self.position = 0
         super(FormDefinitionField, self).save()
-
-    def ____init__(self, field_class=None, name=None, required=None, widget=None, label=None, initial=None, help_text=None, *args, **kwargs):
-        super(FormDefinitionField, self).__init__(*args, **kwargs)
-        self.name = name
-        self.field_class = field_class
-        self.required = required
-        self.widget = widget
-        self.label = label
-        self.initial = initial
-        self.help_text = help_text
 
     def get_form_field_init_args(self):
         args = {
@@ -209,7 +210,7 @@ class FormDefinitionField(models.Model):
             'initial': self.initial if self.initial else None,
             'help_text': self.help_text,
         }
-        
+
         if self.field_class in ('forms.CharField', 'forms.EmailField', 'forms.RegexField'):
             args.update({
                 'max_length': self.max_length,
@@ -256,7 +257,7 @@ class FormDefinitionField(models.Model):
             args.update({
                 'queryset': ModelNameField.get_model_from_string(self.choice_model).objects.all()
             })
-        
+
         if self.field_class == 'forms.ModelChoiceField':
             args.update({
                 'empty_label': self.choice_model_empty_label
@@ -266,16 +267,8 @@ class FormDefinitionField(models.Model):
             args.update({
                 'widget': get_class(self.widget)()
             })
-        
+
         return args
-
-    class Meta:
-        verbose_name = _('Field')
-        verbose_name_plural = _('Fields')
-        ordering = ['position']
-
-    def __unicode__(self):
-        return self.label if self.label else self.name
 
 if 'cms' in django_settings.INSTALLED_APPS:
     from cms.models import CMSPlugin

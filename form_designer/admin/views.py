@@ -23,17 +23,17 @@ def export_csv(request):
     response['Content-Disposition'] = 'attachment; filename=' + settings.CSV_EXPORT_FILENAME
     writer = csv.writer(response, delimiter=settings.CSV_EXPORT_DELIMITER)
     qs = get_change_list_query_set(FormLogAdmin, FormLog, request)
-    
+
     from django.db.models import Count
     distinct_forms = qs.aggregate(Count('form_definition', distinct=True))['form_definition__count']
-    
+
     include_created = settings.CSV_EXPORT_INCLUDE_CREATED
     include_pk = settings.CSV_EXPORT_INCLUDE_PK
     include_header = settings.CSV_EXPORT_INCLUDE_HEADER and distinct_forms == 1
     include_form = settings.CSV_EXPORT_INCLUDE_FORM and distinct_forms > 1
 
     if include_header:
-        header = [] 
+        header = []
         if include_form:
             header.append(_('Form'))
         if include_created:
