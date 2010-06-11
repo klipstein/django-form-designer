@@ -20,6 +20,7 @@ setup(
     packages = [
         'form_designer',
         'form_designer.admin',
+        'form_designer.migrations',
         'form_designer.templatetags',
     ],
     package_data = {
