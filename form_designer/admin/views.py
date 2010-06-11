@@ -1,6 +1,7 @@
 # encoding: utf-8
 import csv
 from django.http import HttpResponse
+from django.utils.encoding import smart_str
 from django.utils.translation import ugettext as _
 
 from form_designer.models import FormLog
@@ -41,7 +42,7 @@ def export_csv(request):
             header.append(_('ID'))
         for field in qs.all()[0].data:
             header.append(field['label'] if field['label'] else field['key'])
-        writer.writerow(header)
+        writer.writerow([smart_str(cell) for cell in header])
 
     for entry in qs:
         row = []
