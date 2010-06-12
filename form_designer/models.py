@@ -150,6 +150,121 @@ class FormLog(models.Model):
         verbose_name_plural = _('Form logs')
         ordering = ['-created']
 
+class AbstractField(models.Model):
+    """
+    Allows our form fields to be used outside of a standard for and allow addition attirubutes for a model
+    """
+    name = models.SlugField(_('name'), max_length=255)
+    field_class = models.CharField(_('Field class'), choices=settings.FIELD_CLASSES, max_length=32)
+    required = models.BooleanField(_('required'), default=True)
+    initial = models.TextField(_('initial value'), blank=True, null=True)
+
+    # Display
+    label = models.CharField(_('label'), max_length=255, blank=True, null=True)
+    widget = models.CharField(_('widget'), default='', choices=settings.WIDGET_CLASSES, max_length=255, blank=True, null=True)
+    help_text = models.CharField(_('help text'), max_length=255, blank=True, null=True)
+    position = models.IntegerField(_('Position'), blank=True, null=True)
+
+    # Text
+    max_length = models.IntegerField(_('Max. length'), blank=True, null=True)
+    min_length = models.IntegerField(_('Min. length'), blank=True, null=True)
+
+    # Numbers
+    max_value = models.FloatField(_('Max. value'), blank=True, null=True)
+    min_value = models.FloatField(_('Min. value'), blank=True, null=True)
+    max_digits = models.IntegerField(_('Max. digits'), blank=True, null=True)
+    decimal_places = models.IntegerField(_('Decimal places'), blank=True, null=True)
+
+    # Regex
+    regex = models.CharField(_('Regular Expression'), max_length=255, blank=True, null=True)
+
+    # Choices
+    choice_values = models.TextField(_('Values'), blank=True, null=True, help_text=_('One value per line'))
+    choice_labels = models.TextField(_('Labels'), blank=True, null=True, help_text=_('One label per line'))
+
+    # Model Choices
+    choice_model_choices = settings.CHOICE_MODEL_CHOICES
+    choice_model = ModelNameField(_('Data model'), max_length=255, blank=True, null=True, choices=choice_model_choices, help_text=('your_app.models.ModelName' if not choice_model_choices else None))
+    choice_model_empty_label = models.CharField(_('Empty label'), max_length=255, blank=True, null=True)
+
+    class Meta:
+        abstract = True
+
+    def __unicode__(self):
+        return self.label if self.label else self.name
+
+    def save(self):
+        if self.position == None:
+            self.position = 0
+        super(FormDefinitionField, self).save()
+
+    def get_form_field_init_args(self):
+        args = {
+            'required': self.required,
+            'label': self.label if self.label else '',
+            'initial': self.initial if self.initial else None,
+            'help_text': self.help_text,
+        }
+
+        if self.field_class in ('forms.CharField', 'forms.EmailField', 'forms.RegexField'):
+            args.update({
+                'max_length': self.max_length,
+                'min_length': self.min_length,
+            })
+
+        if self.field_class in ('forms.IntegerField', 'forms.DecimalField'):
+            args.update({
+                'max_value': int(self.max_value) if self.max_value != None else None,
+                'min_value': int(self.min_value) if self.min_value != None else None,
+            })
+
+        if self.field_class == 'forms.DecimalField':
+            args.update({
+                'max_value': self.max_value,
+                'min_value': self.min_value,
+                'max_digits': self.max_digits,
+                'decimal_places': self.decimal_places,
+            })
+
+        if self.field_class == 'forms.RegexField':
+            if self.regex:
+                args.update({
+                    'regex': self.regex
+                })
+
+        if self.field_class in ('forms.ChoiceField', 'forms.MultipleChoiceField'):
+            if self.choice_values:
+                choices = []
+                regex = re.compile('[\s]*\n[\s]*')
+                values = regex.split(self.choice_values)
+                labels = regex.split(self.choice_labels) if self.choice_labels else []
+                for index, value in enumerate(values):
+                    try:
+                        label = labels[index]
+                    except:
+                        label = value
+                    choices.append((value, label))
+                args.update({
+                    'choices': tuple(choices)
+                })
+
+        if self.field_class in ('forms.ModelChoiceField', 'forms.ModelMultipleChoiceField'):
+            args.update({
+                'queryset': ModelNameField.get_model_from_string(self.choice_model).objects.all()
+            })
+
+        if self.field_class == 'forms.ModelChoiceField':
+            args.update({
+                'empty_label': self.choice_model_empty_label
+            })
+
+        if self.widget:
+            args.update({
+                'widget': get_class(self.widget)()
+            })
+
+        return args
+
 class FormDefinitionField(models.Model):
 
     form_definition = models.ForeignKey(FormDefinition)
