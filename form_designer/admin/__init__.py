@@ -9,6 +9,18 @@ from form_designer.models import FormDefinition, FormDefinitionField, FormLog
 
 MEDIA_SUBDIR = 'form_designer'
 
+class AbstractFieldAdmin(admin.ModelAdmin):
+    fieldsets = (
+        (None, {'fields': ('name', 'field_class', 'required', 'initial')}),
+        (_('Display'), {'fields': ('label', 'widget', 'help_text', 'position'), 'classes': ('collapse',)}),
+        (_('Text'), {'fields': ('max_length', 'min_length'), 'classes': ('collapse',)}),
+        (_('Numbers'), {'fields': ('max_value', 'min_value', 'max_digits', 'decimal_places'), 'classes': ('collapse',)}),
+        (_('Regex'), {'fields': ('regex',), 'classes': ('collapse',)}),
+        (_('Choices'), {'fields': ('choice_values', 'choice_labels'), 'classes': ('collapse',)}),
+        (_('Model Choices'), {'fields': ('choice_model', 'choice_model_empty_label'), 'classes': ('collapse',)}),
+    )
+    list_display = ('name', 'field_class', 'required', 'initial')
+
 class FormDefinitionFieldInlineForm(forms.ModelForm):
     class Meta:
         model = FormDefinitionField
