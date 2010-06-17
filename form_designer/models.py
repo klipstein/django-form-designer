@@ -21,13 +21,11 @@ def get_class(import_path):
     try:
         mod = import_module(module)
     except ImportError, e:
-        raise ImproperlyConfigured('Error importing module %s: "%s"' %
-                                   (module, e))
+        raise ImproperlyConfigured('Error importing module %s: "%s"' % (module, e))
     try:
         return getattr(mod, classname)
     except AttributeError:
-        raise ImproperlyConfigured('Module "%s" does not define a "%s" '
-                                   'class.' % (module, classname))
+        raise ImproperlyConfigured('Module "%s" does not define a "%s"class.' % (module, classname))
 
 class FormDefinition(models.Model):
     name = models.SlugField(_('Name'), max_length=255, unique=True)
@@ -152,7 +150,8 @@ class FormLog(models.Model):
 
 class AbstractField(models.Model):
     """
-    Allows our form fields to be used outside of a standard for and allow addition attirubutes for a model
+    Allows our form fields to be used outside of a standard for and allow
+    addition attirubutes for a model
     """
     name = models.SlugField(_('name'), max_length=255)
     field_class = models.CharField(_('Field class'), choices=settings.FIELD_CLASSES, max_length=32)
@@ -163,7 +162,7 @@ class AbstractField(models.Model):
     label = models.CharField(_('label'), max_length=255, blank=True, null=True)
     widget = models.CharField(_('widget'), default='', choices=settings.WIDGET_CLASSES, max_length=255, blank=True, null=True)
     help_text = models.CharField(_('help text'), max_length=255, blank=True, null=True)
-    position = models.IntegerField(_('Position'), blank=True, null=True)
+    position = models.IntegerField(_('Position'), default=0)
 
     # Text
     max_length = models.IntegerField(_('Max. length'), blank=True, null=True)
@@ -202,11 +201,6 @@ class AbstractField(models.Model):
 
     def __unicode__(self):
         return self.label if self.label else self.name
-
-    def save(self):
-        if self.position == None:
-            self.position = 0
-        super(FormDefinitionField, self).save()
 
     def get_form_field_init_args(self):
         args = {

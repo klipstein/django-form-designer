@@ -20,6 +20,7 @@ class AbstractFieldAdmin(admin.ModelAdmin):
         (_('Model Choices'), {'fields': ('choice_model', 'choice_model_empty_label'), 'classes': ('collapse',)}),
     )
     list_display = ('name', 'field_class', 'required', 'initial')
+    list_filter = ('required', 'field_class')
 
 class FormDefinitionFieldInlineForm(forms.ModelForm):
     class Meta:
