@@ -16,7 +16,7 @@ def get_class(import_path):
     try:
         dot = import_path.rindex('.')
     except ValueError:
-        raise ImproperlyConfigured("%s isn't a Python path." % import_path)
+        raise ImproperlyConfigured('%s isn\'t a Python path.' % import_path)
     module, classname = import_path[:dot], import_path[dot + 1:]
     try:
         mod = import_module(module)
@@ -190,119 +190,6 @@ class AbstractField(models.Model):
     class Meta:
         abstract = True
 
-    def __unicode__(self):
-        return self.label if self.label else self.name
-
-    def save(self):
-        if self.position == None:
-            self.position = 0
-        super(FormDefinitionField, self).save()
-
-    def get_form_field_init_args(self):
-        args = {
-            'required': self.required,
-            'label': self.label if self.label else '',
-            'initial': self.initial if self.initial else None,
-            'help_text': self.help_text,
-        }
-
-        if self.field_class in ('forms.CharField', 'forms.EmailField', 'forms.RegexField'):
-            args.update({
-                'max_length': self.max_length,
-                'min_length': self.min_length,
-            })
-
-        if self.field_class in ('forms.IntegerField', 'forms.DecimalField'):
-            args.update({
-                'max_value': int(self.max_value) if self.max_value != None else None,
-                'min_value': int(self.min_value) if self.min_value != None else None,
-            })
-
-        if self.field_class == 'forms.DecimalField':
-            args.update({
-                'max_value': self.max_value,
-                'min_value': self.min_value,
-                'max_digits': self.max_digits,
-                'decimal_places': self.decimal_places,
-            })
-
-        if self.field_class == 'forms.RegexField':
-            if self.regex:
-                args.update({
-                    'regex': self.regex
-                })
-
-        if self.field_class in ('forms.ChoiceField', 'forms.MultipleChoiceField'):
-            if self.choice_values:
-                choices = []
-                regex = re.compile('[\s]*\n[\s]*')
-                values = regex.split(self.choice_values)
-                labels = regex.split(self.choice_labels) if self.choice_labels else []
-                for index, value in enumerate(values):
-                    try:
-                        label = labels[index]
-                    except:
-                        label = value
-                    choices.append((value, label))
-                args.update({
-                    'choices': tuple(choices)
-                })
-
-        if self.field_class in ('forms.ModelChoiceField', 'forms.ModelMultipleChoiceField'):
-            args.update({
-                'queryset': ModelNameField.get_model_from_string(self.choice_model).objects.all()
-            })
-
-        if self.field_class == 'forms.ModelChoiceField':
-            args.update({
-                'empty_label': self.choice_model_empty_label
-            })
-
-        if self.widget:
-            args.update({
-                'widget': get_class(self.widget)()
-            })
-
-        return args
-
-class FormDefinitionField(models.Model):
-
-    form_definition = models.ForeignKey(FormDefinition)
-    field_class = models.CharField(_('Field class'), choices=settings.FIELD_CLASSES, max_length=32)
-    position = models.IntegerField(_('Position'), blank=True, null=True)
-
-    name = models.SlugField(_('Name'), max_length=255)
-    label = models.CharField(_('Label'), max_length=255, blank=True, null=True)
-    required = models.BooleanField(_('Required'), default=True)
-    include_result = models.BooleanField(_('Include in result'), default=True, help_text=('If this is disabled, the field value will not be included in logs and e-mails generated from form data.'))
-    widget = models.CharField(_('Widget'), default='', choices=settings.WIDGET_CLASSES, max_length=255, blank=True, null=True)
-    initial = models.TextField(_('Initial value'), blank=True, null=True)
-    help_text = models.CharField(_('Help text'), max_length=255, blank=True, null=True)
-
-    choice_values = models.TextField(_('Values'), blank=True, null=True, help_text=_('One value per line'))
-    choice_labels = models.TextField(_('Labels'), blank=True, null=True, help_text=_('One label per line'))
-
-    max_length = models.IntegerField(_('Max. length'), blank=True, null=True)
-    min_length = models.IntegerField(_('Min. length'), blank=True, null=True)
-    max_value = models.FloatField(_('Max. value'), blank=True, null=True)
-    min_value = models.FloatField(_('Min. value'), blank=True, null=True)
-    max_digits = models.IntegerField(_('Max. digits'), blank=True, null=True)
-    decimal_places = models.IntegerField(_('Decimal places'), blank=True, null=True)
-
-    regex = models.CharField(_('Regular Expression'), max_length=255, blank=True, null=True)
-
-    choice_model_choices = settings.CHOICE_MODEL_CHOICES
-    choice_model = ModelNameField(_('Data model'), max_length=255, blank=True, null=True, choices=choice_model_choices, help_text=('your_app.models.ModelName' if not choice_model_choices else None))
-    choice_model_empty_label = models.CharField(_('Empty label'), max_length=255, blank=True, null=True)
-
-    class Meta:
-        verbose_name = _('Field')
-        verbose_name_plural = _('Fields')
-        ordering = ['position']
-
-    def __unicode__(self):
-        return self.label if self.label else self.name
-
     # def ____init__(self, field_class=None, name=None, required=None, widget=None, label=None, initial=None, help_text=None, *args, **kwargs):
     #     super(FormDefinitionField, self).__init__(*args, **kwargs)
     #     self.name = name
@@ -313,6 +200,9 @@ class FormDefinitionField(models.Model):
     #     self.initial = initial
     #     self.help_text = help_text
 
+    def __unicode__(self):
+        return self.label if self.label else self.name
+
     def save(self):
         if self.position == None:
             self.position = 0
@@ -385,6 +275,16 @@ class FormDefinitionField(models.Model):
 
         return args
 
+class FormDefinitionField(AbstractField):
+    form_definition = models.ForeignKey(FormDefinition)
+    include_result = models.BooleanField(_('Include in result'), default=True, help_text=('If this is disabled, the field value will not be included in logs and e-mails generated from form data.'))
+
+    class Meta:
+        verbose_name = _('Field')
+        verbose_name_plural = _('Fields')
+        ordering = ['position']
+
+
 if 'cms' in django_settings.INSTALLED_APPS:
     from cms.models import CMSPlugin
 
@@ -393,6 +293,7 @@ if 'cms' in django_settings.INSTALLED_APPS:
 
         def __unicode__(self):
             return self.form_definition.__unicode__()
+
 
 if 'south' in django_settings.INSTALLED_APPS:
     from south.modelsinspector import add_introspection_rules
