@@ -8,7 +8,8 @@ from django.shortcuts import get_object_or_404, render_to_response
 from django.template import RequestContext
 from django.utils.translation import ugettext as _
 
-from form_designer.models import FormDefinition, get_class
+from form_designer.models import FormDefinition
+from form_designer.utils import get_class
 
 class DesignedForm(forms.Form):
     def __init__(self, form_definition, initial_data=None, *args, **kwargs):
