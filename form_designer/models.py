@@ -194,19 +194,21 @@ class AbstractField(models.Model):
             'help_text': self.help_text,
         }
 
-        if self.field_class in ('forms.CharField', 'forms.EmailField', 'forms.RegexField'):
+        field_class = self.field_class.split('.')[-1]
+
+        if field_class in ('CharField', 'EmailField', 'RegexField'):
             args.update({
                 'max_length': self.max_length,
                 'min_length': self.min_length,
             })
 
-        if self.field_class in ('forms.IntegerField', 'forms.DecimalField'):
+        if field_class in ('IntegerField', 'DecimalField'):
             args.update({
                 'max_value': int(self.max_value) if self.max_value != None else None,
                 'min_value': int(self.min_value) if self.min_value != None else None,
             })
 
-        if self.field_class == 'forms.DecimalField':
+        if field_class in ('DecimalField',):
             args.update({
                 'max_value': self.max_value,
                 'min_value': self.min_value,
@@ -214,13 +216,13 @@ class AbstractField(models.Model):
                 'decimal_places': self.decimal_places,
             })
 
-        if self.field_class == 'forms.RegexField':
+        if field_class in ('RegexField',):
             if self.regex:
                 args.update({
                     'regex': self.regex
                 })
 
-        if self.field_class in ('forms.ChoiceField', 'forms.MultipleChoiceField'):
+        if field_class in ('ChoiceField', 'MultipleChoiceField'):
             if self.choice_values:
                 choices = []
                 regex = re.compile('[\s]*\n[\s]*')
@@ -236,12 +238,12 @@ class AbstractField(models.Model):
                     'choices': tuple(choices)
                 })
 
-        if self.field_class in ('forms.ModelChoiceField', 'forms.ModelMultipleChoiceField'):
+        if field_class in ('ModelChoiceField', 'ModelMultipleChoiceField'):
             args.update({
                 'queryset': ModelNameField.get_model_from_string(self.choice_model).objects.all()
             })
 
-        if self.field_class == 'forms.ModelChoiceField':
+        if field_class in ('ModelChoiceField',):
             args.update({
                 'empty_label': self.choice_model_empty_label
             })
