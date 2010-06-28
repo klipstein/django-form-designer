@@ -96,7 +96,7 @@ class FormLogAdmin(admin.ModelAdmin):
         extra_context = extra_context or {}
         try:
             query_string = '?'+request.META['QUERY_STRING']
-        except TypeError, KeyError:
+        except (TypeError, KeyError):
             query_string = ''
         try:
             extra_context['export_csv_url'] = reverse('form_designer_export_csv')+query_string
