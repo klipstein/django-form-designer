@@ -11,6 +11,12 @@ class FieldStub(AbstractField):
 class ModelChoice(models.Model):
     choice = models.CharField(max_length=80)
 
+    def __unicode__(self):
+        return u'%s' % self.choice
+
+# Register our test model so django knows about it
+# models.register_models('form_designer', ['ModelChoice'])
+
 class DynamicFormTestCase(TestCase):
     """
     Do some sanity checking to make sure that what we are putting into our
@@ -161,14 +167,16 @@ class DynamicFormTestCase(TestCase):
         }).is_valid())
 
     # TODO: Get these test working
-    # def test_model_choice_field(self):
-    #     query_set = FieldStub.objects.filter(name='ModelChoiceField')
-    #     # self.assert_(self.form(query_set, data={
-    #     #     'ModelChoiceField': 'two'
-    #     # }).is_valid())
-    #     self.assertFalse(self.form(query_set, data={
-    #         'ModelChoiceField': 'testage'
-    #     }).is_valid())
+    def test_model_choice_field(self):
+        query_set = FieldStub.objects.filter(name='ModelChoiceField')
+        # print ModelChoice.objects.all()
+        # print self.form(query_set)
+        # self.assert_(self.form(query_set, data={
+        #     'ModelChoiceField': 'two'
+        # }).is_valid())
+        # self.assertFalse(self.form(query_set, data={
+        #     'ModelChoiceField': 'testage'
+        # }).is_valid())
 
     # def test_model_multiple_choice_field(self):
     #     query_set = FieldStub.objects.filter(name='ModelMultipleChoiceField')

@@ -239,6 +239,7 @@ class AbstractField(models.Model):
                 })
 
         if field_class in ('ModelChoiceField', 'ModelMultipleChoiceField'):
+            print self.choice_model, ModelNameField.get_model_from_string(self.choice_model)
             args.update({
                 'queryset': ModelNameField.get_model_from_string(self.choice_model).objects.all()
             })
