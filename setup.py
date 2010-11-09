@@ -28,6 +28,7 @@ setup(
         'form_designer': [
             'media/form_designer/js/lib/*/js/*.js',
             'media/form_designer/js/lib/*/*.js',
+            'media/form_designer/js/lib/*.js',
             'templates/admin/form_designer/formlog/change_list.html',
             'templates/html/formdefinition/*.html',
             'templates/html/formdefinition/forms/*.html',

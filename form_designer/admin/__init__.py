@@ -51,6 +51,7 @@ class FormDefinitionForm(forms.ModelForm):
 
     class Media:
         js = [
+            'form_designer/js/lib/jquery-admin-tools-fix.js',
             'form_designer/js/lib/jquery-ui.js',
             'form_designer/js/lib/django-admin-tweaks-js-lib/js/jquery-inline-positioning.js',
             'form_designer/js/lib/django-admin-tweaks-js-lib/js/jquery-inline-rename.js',
