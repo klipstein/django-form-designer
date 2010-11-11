@@ -34,7 +34,7 @@ class FormDefinitionFieldInlineForm(forms.ModelForm):
 class FormDefinitionFieldInline(admin.StackedInline):
     form = FormDefinitionFieldInlineForm
     model = FormDefinitionField
-    extra = 1
+    extra = 0
     fieldsets = [
         (None, {'fields': ['name', 'field_class', 'required', 'initial']}),
         (_('Display'), {'fields': ['label', 'widget', 'help_text', 'position', 'include_result']}),
